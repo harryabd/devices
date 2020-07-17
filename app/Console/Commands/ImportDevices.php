@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 use App\Device;
 use App\Upload;
 
@@ -14,7 +13,7 @@ class ImportDevices extends Command
      *
      * @var string
      */
-    protected $signature = 'import:devices';
+    protected $signature = 'import:devices {limit}';
 
     /**
      * The console command description.
@@ -40,8 +39,9 @@ class ImportDevices extends Command
      */
     public function handle()
     {
+        $limit = $this->argument('limit');
         $filePattern = base_path("resources/pendingDevices/*.csv");
-        foreach (array_slice(glob($filePattern), 0) as $file)
+        foreach (array_slice(glob($filePattern), 0, $limit) as $file)
         {
             // Create upload/import entity
             $upload = Upload::create([
@@ -54,11 +54,7 @@ class ImportDevices extends Command
                 if ($row->install_date = Device::validateDateInput($row->install_date)) {
                     $row = (array) $row;
                     // Create/update record with the import file id + data from the csv
-                    $response = Http::post('http://127.0.0.1:8000/api/devices/', $row);
-                    if (!$response->successful()) {
-                        // if failed response then stop consuming file (in a prod env bury the job for investigation and log)
-                        continue 2;
-                    }
+                    Device::create($row);
                 } else {
                     // Ignore invalid date inputs
                     continue;
