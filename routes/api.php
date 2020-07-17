@@ -19,27 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('devices', function() {
-    return Device::all();
-});
-
-Route::get('devices/{id}', function($id) {
-    return Device::find($id);
-});
-
-Route::post('devices', function(Request $request) {
-    return Device::create($request->all);
-});
-
-Route::put('devices/{id}', function(Request $request, $id) {
-    $device = Device::findOrFail($id);
-    $device->update($request->all());
-
-    return $device;
-});
-
-Route::delete('devices/{id}', function($id) {
-    Device::find($id)->delete();
-
-    return 204;
-});
+Route::get('devices', 'DeviceController@index');
+Route::get('devices/{id}', 'DeviceController@show');
+Route::post('devices', 'DeviceController@store');
+Route::put('devices/{id}', 'DeviceController@update');
+Route::delete('devices/{id}', 'DeviceController@delete');
