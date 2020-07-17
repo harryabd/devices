@@ -36,7 +36,7 @@ class DeviceController extends Controller
      */
     public function store(Request $request)
     {
-        return Device::create($request->all);
+        return Device::create($request->all());
     }
 
     /**
@@ -63,7 +63,8 @@ class DeviceController extends Controller
      */
     public function delete(Request $request, $id)
     {
-        Device::find($id)->delete();
+        $device = Device::findOrFail($id);
+        $device->delete();
 
         return 204;
     }
